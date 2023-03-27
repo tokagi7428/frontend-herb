@@ -1,0 +1,120 @@
+.card-map{
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  width: 220px;
+  height: 270px;
+}
+.icon{
+  font-size: 20px;
+}
+.place{
+  margin-top: 10px;
+  font-weight: bold;
+}
+label{
+  /* border-bottom: 1px solid tomato; */
+  margin-top: 5px;
+  color:tomato;
+  width: max-content;
+}
+.card-map p{
+  margin-top: 5px;
+}
+
+.star{
+  color: gold;
+  margin-top: 5px;
+}
+
+.username{
+  font-size:14px;
+}
+.date{
+  font-size:12px;
+}
+
+.card-map > input {
+  border:none;
+  border-bottom: 1px solid #888;
+  margin-top: 5px;
+  outline: none;
+  padding: 5px;
+}
+
+.btn{
+  border:none;
+  outline: none;
+  background-color: tomato;
+  padding: 5px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.mapboxgl-popup-close-button{
+  font-size: 1.8rem !important;
+  right: 5px !important;
+  top: 5px !important;
+  color:white;
+  background: #000 !important;
+} 
+.mapboxgl-popup-close-button:hover{
+  padding: 5px !important;
+}
+
+select{
+  outline: none;
+  margin-top: 5px;
+}
+
+input::placeholder{
+  color:#888;
+}
+
+.map-link-back{
+  position:absolute;
+  top:10px;
+  left: 10px;
+  background: white;
+  padding: 10px;
+}
+
+
+
+
+.paginationBttns {
+  width: 100%;
+  height: 10px;
+  list-style: none;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.paginationBttns a {
+  padding: 5px 10px;
+  margin: 8px;
+  border-radius: 5px;
+  border: 1px solid #024959;
+  color: #026773;
+  cursor: pointer;
+}
+
+.paginationBttns a:hover {
+  color: white;
+  background-color: #024959;
+  height: 10px;
+  width: 10px;
+  padding: 5px 10px;
+}
+
+.paginationActive a {
+  color: white;
+  background-color: #026773;
+}
+
+.paginationDisabled a {
+  color: grey;
+  display: none;
+  cursor: not-allowed;
+}
