@@ -35,7 +35,7 @@ function Herbs() {
   };
   const sendImageAi = async () => {
     if (!image) return
-    const { data } = await axios.post('http://127.0.0.1:5000/api/imageHerb', { image })
+    const { data } = await axios.post(`${import.meta.env.VITE_YOLO_URL}`, { image })
     console.log("name : ", data)
     let name = data.class_label.class_name
     if (name == "butterfly pea") {
