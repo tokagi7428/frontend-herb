@@ -8,10 +8,15 @@ import { deleteherb, getAllherbs } from '../redux/actions/herbAction'
 import axios from 'axios';
 import { toast } from 'react-toastify'
 import Swal from 'sweetalert2'
-function Admin() {
+import { connect } from "react-redux";
+function Admin({ user }) {
+    // console.log({ user })
     // pagination
     const [pageNumberHerb, setPageNumberHerb] = useState(0)
     const [pageNumberFarm, setPageNumberFarm] = useState(0)
+    const [pageNumberUser, setPageNumberUser] = useState(0)
+    const [allUser, setAllUser] = useState([])
+    // const [role, setRole] = ("")
     const [tab, setTab] = useState(0)
     const dispatch = useDispatch()
     // state.farm => fetchFarm
@@ -28,6 +33,15 @@ function Admin() {
         dispatch(getAllFarms())
         dispatch(getAllherbs())
     }, [dispatch])
+
+    useEffect(() => {
+        const getUser = async () => {
+            const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/user`)
+            // console.log({ data })
+            setAllUser(data)
+        }
+        getUser()
+    }, allUser)
 
     const editApprove = async (id, approved, nameApi) => {
         console.log({ approved, id })
@@ -72,6 +86,14 @@ function Admin() {
             // }
         })
     }
+
+    // update user
+    const updateUser = async (id, role) => {
+        const { data } = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/user/${id}/edit`, { id, role })
+        console.log({ data })
+    }
+
+    // delete herb
     const confirmDeleteHerb = (id, name) => {
         Swal.fire({
             title: 'ยืนยันการลบข้อมูลหรือไม่!',
@@ -107,6 +129,13 @@ function Admin() {
     const changeFarmPage = ({ selected }) => {
         setPageNumberFarm(selected);
     };
+    // user
+    const usersPerPage = 5;
+    const pagesVisitedUser = pageNumberUser * usersPerPage;
+    const pageCountUser = Math.ceil(allUser.length / usersPerPage);
+    const changeUserPage = ({ selected }) => {
+        setPageNumberUser(selected);
+    };
     const active = 'py-2 bg-gray-500 text-white sm:px-4 flex gap-2 w-[250px] items-center'
     const notActive = 'py-2 flex gap-2 w-[300px] items-center'
     return (
@@ -120,13 +149,24 @@ function Admin() {
                 </svg>
                     <button onClick={() => setTab(0)}>
                         แหล่งเพาะปลูก</button>
-                </div><div className={tab == 1 ? active : notActive}>
+                </div>
+                <div className={tab == 1 ? active : notActive}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ml-4">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
                     </svg>
                     <button onClick={() => setTab(1)}>สมุนไพร</button>
                 </div>
+                {
+                    user.isAdmin
+                    &&
+                    <div className={tab == 2 ? active : notActive}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                        </svg>
 
+                        <button onClick={() => setTab(2)}>ผู้ใช้</button>
+                    </div>
+                }
             </div>
             <div className="flex-1 bg-white">
                 <div className="flex lg:flex-row flex-col">
@@ -157,8 +197,11 @@ function Admin() {
                                                             <th scope="col" className="py-3 px-6">รูปภาพ</th>
                                                             <th scope="col" className="py-3 px-6">แก้ไขล่าสุด</th>
                                                             <th scope="col" className="py-3 px-6">แก้ไข</th>
-                                                            <th scope="col" className="py-3 px-6">ลบ</th>
-                                                            <th scope="col" className="py-3 px-6">อนุมัติหรือไม่</th>
+                                                            {user.isAdmin && <th scope="col" className="py-3 px-6">ลบ</th>}
+                                                            {
+                                                                user.isAdmin && <th scope="col" className="py-3 px-6">อนุมัติหรือไม่</th>
+                                                            }
+
                                                         </tr>
                                                     </thead>
                                                     <tbody >
@@ -178,18 +221,21 @@ function Admin() {
                                                                         </Link>
                                                                     </td>
 
-                                                                    <td><button onClick={() => confirmDeleteHerb(farm._id, farm.name)} className="px-4 py-2 flex rounded-md justify-center items-center bg-red-500 hover:bg-red-800 text-white hover:text-red-500 max-w-fit max-h-fit" id="delete">
+                                                                    {user.isAdmin && <td><button onClick={() => confirmDeleteHerb(farm._id, farm.name)} className="px-4 py-2 flex rounded-md justify-center items-center bg-red-500 hover:bg-red-800 text-white hover:text-red-500 max-w-fit max-h-fit" id="delete">
                                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="#999" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                                                             <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                                                                         </svg>
                                                                         <span>ลบ</span>
-                                                                    </button></td>
-                                                                    <td className='flex justify-center items-center'>
-                                                                        <label className="relative inline-flex items-center cursor-pointer">
-                                                                            <input type="checkbox" checked={farm.approved} value={farm.approved} onChange={() => editApprove(farm._id, !farm.approved, "farm")} className="sr-only peer" />
-                                                                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                                                                        </label>
-                                                                    </td>
+                                                                    </button></td>}
+                                                                    {
+                                                                        user.isAdmin && <td className='flex justify-center items-center'>
+                                                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                                                <input type="checkbox" checked={farm.approved} value={farm.approved} onChange={() => editApprove(farm._id, !farm.approved, "farm")} className="sr-only peer" />
+                                                                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                                                            </label>
+                                                                        </td>
+                                                                    }
+
                                                                 </tr>
                                                             )
                                                         })}
@@ -244,8 +290,12 @@ function Admin() {
                                                                 <th scope="col" className="py-3 px-6">รูปภาพ</th>
                                                                 <th scope="col" className="py-3 px-6">แก้ไขล่าสุด</th>
                                                                 <th scope="col" className="py-3 px-6">แก้ไข</th>
-                                                                <th scope="col" className="py-3 px-6">ลบ</th>
-                                                                <th scope="col" className="py-3 px-6">อนุมัติหรือไม่</th>
+                                                                {
+                                                                    user.isAdmin && <th scope="col" className="py-3 px-6">ลบ</th>
+                                                                }
+                                                                {
+                                                                    user.isAdmin && <th scope="col" className="py-3 px-6">อนุมัติหรือไม่</th>
+                                                                }
                                                             </tr>
                                                         </thead>
                                                         <tbody >
@@ -256,25 +306,33 @@ function Admin() {
                                                                         <td className="py-4 px-6"><img src={`${herb.image}`} alt={herb.name} width={50} className=' max-h-10' /></td>
                                                                         <td className="py-4 lg:px-6 w-[150px] ">{convertDate(herb.updatedAt)}</td>
                                                                         <td className="mt-4 px-4 rounded-md flex mx-2 justify-center items-center bg-amber-400 hover:bg-amber-500 text-white hover:text-red-500 max-w-fit max-h-fit">
-                                                                            <Link to={`/admin/herb/edit/${herb._id}`} className="flex items-center py-2 rounded-md font-bold"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                                                                            </svg>
-                                                                                <span>แก้ไข</span></Link>
+                                                                            <div className="block">
+                                                                                <Link to={`/admin/herb/edit/${herb._id}`} className="flex items-center py-2 rounded-md font-bold"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                                                                </svg>
+                                                                                    <span>แก้ไข</span></Link>
+                                                                            </div>
                                                                         </td>
 
-                                                                        <td><button onClick={() => confirmDeleteHerb(herb._id, herb.name)} className="px-4 py-2 flex rounded-md justify-center items-center bg-red-500 hover:bg-red-800 text-white hover:text-red-500 max-w-fit max-h-fit" id="delete">
-                                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="#999" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                                                            </svg>
-                                                                            <span>ลบ</span>
-                                                                        </button></td>
-                                                                        <td className='flex justify-center items-center'>
+                                                                        {
+                                                                            user.isAdmin &&
+                                                                            <td><button onClick={() => confirmDeleteHerb(herb._id, herb.name)} className="px-4 py-2 flex rounded-md justify-center items-center bg-red-500 hover:bg-red-800 text-white hover:text-red-500 max-w-fit max-h-fit" id="delete">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="#999" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                                                                </svg>
+                                                                                <span>ลบ</span>
+                                                                            </button></td>
+                                                                        }
+                                                                        {
+                                                                            user.isAdmin &&
+                                                                            <td className='flex justify-center items-center'>
 
-                                                                            <label className="relative inline-flex items-center cursor-pointer">
-                                                                                <input type="checkbox" checked={herb.approved} value={herb.approved} onChange={() => editApprove(herb._id, !herb.approved, "herb")} className="sr-only peer" />
-                                                                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                                                                            </label>
-                                                                        </td>
+                                                                                <label className="relative inline-flex items-center cursor-pointer">
+                                                                                    <input type="checkbox" checked={herb.approved} value={herb.approved} onChange={() => editApprove(herb._id, !herb.approved, "herb")} className="sr-only peer" />
+                                                                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                                                                </label>
+                                                                            </td>
+                                                                        }
                                                                     </tr>
                                                                 )
                                                             })}
@@ -302,6 +360,74 @@ function Admin() {
                             </div>
                         )
                     }
+                    {
+                        tab == 2 && (
+                            <div className="lg:max-w-5xl md:max-w-2xl max-w-xl p-10 w-full sm:mx-auto my-4 w-md shadow-2xl rounded-md border-2 lg:mr-2 mr-0">
+
+                                {
+                                    isLoadingHerbs
+                                        ? <div>Loading</div>
+                                        : errorHerbs
+                                            ?
+                                            <div>{errorHerbs}</div>
+                                            :
+                                            <div className="">
+                                                <div className="overflow-x-auto relative">
+                                                    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                                        <thead className="text-md text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                                            <tr>
+                                                                <th scope="col" className="py-3 px-6 m-w-[500px]">ชื่อ</th>
+                                                                <th scope="col" className="py-3 px-6">อีเมลล์</th>
+                                                                <th scope="col" className="py-3 px-6">ต่ำแหน่ง</th>
+                                                                <th scope="col" className="py-3 px-6">ลบ</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody >
+                                                            {allUser.slice(pagesVisitedUser, pagesVisitedUser + usersPerPage).map((user) => {
+                                                                return (
+                                                                    <tr key={user._id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 " >
+                                                                        <td className="py-4 lg:px-6"><span className='text-sm mr-1 hover:text-blue-500 '>{user.username}</span></td>
+                                                                        <td className="py-4 lg:px-6"><span className='text-sm mr-1 hover:text-blue-500 '>{user.email}</span></td>
+                                                                        <td className="py-4 lg:px-6">
+                                                                            <select name="role" id="role" onChange={(e) => updateUser(user._id, e.target.value)}>
+                                                                                <option value="herbalist" selected={user.role == "herbalist"}>นักสมุนไพร</option>
+                                                                                <option value="user" selected={user.role == "user"}>ผู้ใช้งานทั่วไป</option>
+                                                                                <option value="admin" selected={user.role == "admin"}>ผู้ดูแลระบบ</option>
+                                                                            </select>
+                                                                        </td>
+                                                                        <td><button onClick={() => confirmDeleteHerb(user._id, user.name)} className="px-4 py-2 flex rounded-md justify-center items-center bg-red-500 hover:bg-red-800 text-white hover:text-red-500 max-w-fit max-h-fit" id="delete">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="#999" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                                                            </svg>
+                                                                            <span>ลบ</span>
+                                                                        </button></td>
+                                                                    </tr>
+                                                                )
+                                                            })}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                {allUser.length &&
+                                                    <ReactPaginate
+                                                        breakLabel="..."
+                                                        nextLabel={"หน้าถัดไป"}
+                                                        previousLabel={"ก่อนหน้า"}
+                                                        pageCount={pageCountUser}
+                                                        onPageChange={changeUserPage}
+                                                        containerClassName={"paginationBttns"}
+                                                        previousLinkClassName={"previousBttn"}
+                                                        nextLinkClassName={"nextBttn"}
+                                                        disabledClassName={"paginationDisabled"}
+                                                        activeClassName={"paginationActive"}
+                                                    />
+                                                }
+
+                                            </div>
+                                }
+                            </div>
+                        )
+                    }
                 </div>
 
 
@@ -310,4 +436,7 @@ function Admin() {
     )
 }
 
-export default Admin
+const mapStateProps = ({ session }) => ({
+    user: session.user,
+})
+export default connect(mapStateProps, null)(Admin)

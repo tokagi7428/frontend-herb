@@ -7,6 +7,7 @@ import Login from "../../pages/Login/Login";
 function Navbar({ user, logoutUser }) {
     const [navbar, setNavbar] = useState(false);
     const [loginActive, setLoginActive] = useState(false);
+    console.log({ user })
     const location = useLocation();
     useEffect(() => {
         if (loginActive) {
@@ -113,9 +114,33 @@ function Navbar({ user, logoutUser }) {
                                     :
                                     user?.username
                                         ?
-                                        <li className="text-white text-lg font-semibold hover:text-blue-600 hover:underline">
-                                            <Link to="/login" >{user?.username}</Link>
-                                        </li>
+                                        <div className="relative group">
+                                            {
+                                                user.role == "herbalist" ?
+                                                    <Link to="/admin" className={location.pathname === "/admin" ? active : notActive}>
+                                                        <div className="flex flex-col">
+                                                            <span> {user.username}</span>
+                                                            <span> {user.role == "herbalist" ? "นักสมุนไพร" : ""}</span>
+                                                        </div>
+                                                    </Link>
+                                                    : <span className="text-2xl text-navbarFont font-bold"> {user.username}</span>
+                                            }
+                                            <div className="absolute z-10 hidden group-hover:flex">
+
+                                                <div className="bg-white shadow-lg w-[120px]">
+                                                    <div className="grid grid-cols-1 gap-4 ">
+                                                        <p className="px-5 py-3 hover:bg-gray-200 hover:text-amber-700 hover:underline cursor-pointer" onClick={() => logoutUser()}>
+                                                            ลงชื่อออก
+                                                        </p>
+                                                    </div>
+                                                    {/* <div className="grid grid-cols-1 gap-4 ">
+                                                    <p className="px-5 py-3 hover:bg-gray-200 hover:text-amber-700 hover:underline cursor-pointer">
+                                                        โปรไฟล์
+                                                    </p>
+                                                </div> */}
+                                                </div>
+                                            </div>
+                                        </div>
                                         :
                                         <li className="text-white text-lg font-semibold hover:text-blue-600 hover:underline relative">
                                             <button type="button" onClick={() => setLoginActive(!loginActive)} className={notActive}>ลงชื่อเข้าใช้</button>
