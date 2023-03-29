@@ -50,7 +50,7 @@ function Admin({ user }) {
             console.log("updated : ", res)
             const { message } = res.data
             toast.success(message)
-            window.location.reload(true);
+            // window.location.reload(true);
             return res.data
         } catch (e) {
             toast.error(e.message)
