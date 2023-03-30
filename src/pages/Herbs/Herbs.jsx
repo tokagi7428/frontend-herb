@@ -36,7 +36,7 @@ function Herbs() {
   };
   const sendImageAi = async () => {
     if (!image) return
-    const { data } = await axios.post(`${import.meta.env.VITE_YOLO_URL}`, { image })
+    const { data } = await axios.post(`https://b1e3-1-47-6-124.ap.ngrok.io/api/imageHerb`, { image })
     console.log("name : ", data)
     let name = data.class_label.class_name
     if (name == "butterfly pea") {
@@ -47,6 +47,7 @@ function Herbs() {
       name = "กระเจี๊ยบแดง"
     }
     setQuery(name)
+    setClose(false)
     setSearch(true)
     // console.log({ query })
   }
