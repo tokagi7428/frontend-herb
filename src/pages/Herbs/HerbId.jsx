@@ -6,7 +6,6 @@ import { useLocation } from 'react-router-dom'
 import { getherb } from '../../redux/actions/herbAction'
 import { useDispatch } from 'react-redux'
 import { FETCH_ERROR, FETCH_REQUEST, FETCH_SUCCESS } from '../../redux/actions/fetchAction'
-import { FacebookIcon, FacebookShareButton, FacebookShareCount } from 'react-share'
 import { toast } from 'react-toastify'
 function HerbId() {
     const [herb, setHerb] = useState(null)
@@ -109,13 +108,6 @@ function HerbId() {
                     </div>
                 </div>
             </div>}
-            {/* <FacebookShareButton
-                url={`www.${window.location.hostname}/herb/${HerbId}`}
-                title={`${herb?.name}`}
-
-            >
-                <FacebookIcon />
-            </FacebookShareButton> */}
         </div>
     )
 }
