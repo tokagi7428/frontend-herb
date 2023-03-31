@@ -1,11 +1,15 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllherbs } from '../../redux/actions/herbAction'
 import { Link } from 'react-router-dom'
 import { Helmet } from "react-helmet-async";
 import topgraphic from '../../assets/images/topgraphic.png'
+import * as tf from "@tensorflow/tfjs";
+import "@tensorflow/tfjs-backend-webgl"; // set backend to webgl
+import { detectImage } from "../../utils/detect.js"
 import axios from 'axios'
+import SendImage from '../SendImage'
 function Herbs() {
   const dispatch = useDispatch()
   const herbs = useSelector((state) => state.herb.herbs)
@@ -17,6 +21,56 @@ function Herbs() {
   const [close, setClose] = useState(false)
   const keys = ["name"]
 
+  // load and get models yolo
+  const [loading, setLoading] = useState({ loading: true, progress: 0 });
+  // references
+  const imageRef = useRef(null);
+  const imageRef1 = useRef(null);
+  const canvasRef = useRef(null);
+  const [classesName, setClassesName] = useState([])
+  const [model, setModel] = useState({
+    net: null,
+    inputShape: [1, 0, 0, 3],
+  }); // init model & input shape
+  // model configs
+  const modelName = "herb";
+  const classThreshold = 0.2;
+
+  useEffect(() => {
+    // console.log("herb : ", `${window.location.origin}/${modelName}_web_model/model.json`)
+    tf.ready().then(async () => {
+      const herb = await tf.loadGraphModel(
+        `${window.location.origin}/${modelName}_web_model/model.json`,
+        {
+          onProgress: (fractions) => {
+            setLoading({ loading: true, progress: fractions }); // set loading fractions
+          },
+        }
+      ); // load model
+      console.log({ herb })
+      // warming up model
+      const dummyInput = tf.ones(herb.inputs[0].shape);
+      const warmupResult = await herb.executeAsync(dummyInput);
+      tf.dispose(warmupResult); // cleanup memory
+      tf.dispose(dummyInput); // cleanup memory
+
+      setLoading({ loading: false, progress: 1 });
+      setModel({
+        net: herb,
+        inputShape: herb.inputs[0].shape,
+      }); // set model & input shape
+    });
+  }, []);
+  const closeImage = () => {
+    setClose(false)
+    const url = imageRef.current.src;
+    imageRef.current.src = "#"; // restore image source
+    URL.revokeObjectURL(url); // revoke url
+
+    setStreaming(null); // set streaming to null
+    inputImageRef.current.value = ""; // reset input image
+    imageRef.current.style.display = "none"; // hide image
+  };
   useEffect(() => {
     dispatch(getAllherbs())
   }, [dispatch])
@@ -34,20 +88,32 @@ function Herbs() {
       )
       : newHerb;
   };
-  const sendImageAi = async () => {
-    if (!image) return
-    const { data } = await axios.post(`https://b1e3-1-47-6-124.ap.ngrok.io/api/imageHerb`, { image })
-    console.log("name : ", data)
-    let name = data.class_label.class_name
-    if (name == "butterfly pea") {
+
+  const sendImageAi = () => {
+    // if (classesName.length == 0) return
+    console.log("name : ", classesName[0])
+    let name = classesName[0];
+    if (name == "Rhinacanthus nasutus-") {
+      name = "เสลดพังพอนตัวผู้"
+    } else if (name == "Orthosiphon aristatus") {
+      name = "ทองพันชั่ง"
+    } else if (name == "Female Esldpagpon") {
+      name = "หญ้าหนวดแมว"
+    } else if (name == "Rang Chuet") {
       name = "อัญชัน"
-    } else if (name == "Rang Chuet" || name == "laurel clock") {
+    }
+    else if (name == "Rhinacanthus nasutus" || name == "Female Esldpagpon") {
+      name = "เสลดพังพอนตัวเมีย"
+    }
+    else if (name == "butterfly pea") {
       name = "รางจืด"
-    } else if (name == "Rang Chuet" || name == "laurel clock") {
+    }
+    else if (name == "okra" || name == "laurel clock") {
       name = "กระเจี๊ยบแดง"
     }
+    console.log({ classesName })
+    setClassesName([])
     setQuery(name)
-    setClose(false)
     setSearch(true)
     // console.log({ query })
   }
@@ -62,6 +128,11 @@ function Herbs() {
       setQuery(query);
     }
   };
+
+  // if (imageRef.current != null) {
+  //   setClose(true)
+  // }
+  // console.log("imageRef : ", imageRef.current)
 
   const handleDropImage = (file) => {
     // Push all the axios request promise into a single array
@@ -97,7 +168,6 @@ function Herbs() {
       <Helmet><title>ข้อมูลสมุนไพรทั้งหมด</title></Helmet>
       <div className="lg:max-w-5xl sm:max-w-2xl max-w-sm mx-auto my-4">
         <form className="flex justify-start items-center max-w-[800px] my-4 mt-8 ml-2 mx-auto">
-
           <div className="relative w-fit">
             <select onChange={(e) => setStatusInput(e.target.value)} className='h-[40px] hover:bg-narbarBg1 text-white pl-3 sm:w-[150px] xs:w-[100px] rounded-tl-lg rounded-bl-lg bg-narbarBg2'>
               <option value="text" selected>ข้อความ</option>
@@ -115,7 +185,7 @@ function Herbs() {
               </button> */}
             </div>
             <div className={statusInput == "text" ? "hidden" : "relative"}>
-              <input type="file" title='เพิ่มรูปภาพที่นี่' onChange={(e) => handleDropImage(e.target.files[0])} className='bg-white w-full file:hover:bg-slate-700 file:bg-black file:py-[6.5px] file:text-white' placeholder="ค้นหาสมุนไพร" required />
+              <SendImage imageRef={imageRef} />
               <span className="absolute right-2 bottom-2 text-amber-400">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.75 12l3 3m0 0l3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
@@ -127,20 +197,30 @@ function Herbs() {
             <svg aria-hidden="true" className="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>ค้นหา
           </button>
         </form>
-        {
-          close && <div className="fixed top-0 left-0 bottom-0 right-0 bg-bgShadow bg-blend-darken overflow-auto z-50">
+
+        <div className={classesName.length > 0 ? "" : "hidden"}>
+          <div className="fixed top-0 left-0 bottom-0 right-0 bg-bgShadow bg-blend-darken overflow-auto z-50">
             <div className="absolute transition-transform w-[500px] p-10 rounded-md text-navbarFont1 bg-white" style={{ transform: 'translate(-50%,-50%)', top: '50%', left: '50%' }}>
-              <span className='absolute top-3 right-5 font-bold cursor-pointer text-lg' title='closes' onClick={() => setClose(false)} >x</span>
-              <img src={image} alt="" class="h-[300px] w-full" />
+              <span className='absolute top-3 right-5 font-bold cursor-pointer text-lg' title='closes' onClick={() => closeImage()} >x</span>
+              <div className="contents">
+                <img
+                  src="#"
+                  ref={imageRef}
+                  alt="" class="h-[300px] w-full"
+                  onLoad={() => detectImage(imageRef.current, model, classThreshold, canvasRef.current, setClassesName)}
+                />
+                <canvas width={model.inputShape[1]} height={model.inputShape[2]} ref={canvasRef} className=' hidden' />
+              </div>
               <div className="flex mt-3">
-                <input type="file" title='เพิ่มรูปภาพที่นี่' onChange={(e) => handleDropImage(e.target.files[0])} className='bg-white w-full file:hover:bg-slate-700 file:bg-black file:py-[6.5px] file:text-white' placeholder="ค้นหาสมุนไพร" required />
-                <button type="button" onClick={() => statusInput == "text" ? setSearch(true) : sendImageAi()} className="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-emerald-600 rounded-lg border border-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:focus:ring-emerald-800">
+                <SendImage imageRef={imageRef} />
+                <button type="button" onClick={() => sendImageAi()} className="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-emerald-600 rounded-lg border border-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:focus:ring-emerald-800">
                   <svg aria-hidden="true" className="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>ค้นหา
                 </button>
               </div>
             </div>
           </div>
-        }
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 my-10">
           {
             searchFilter().length === 0
