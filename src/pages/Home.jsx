@@ -99,6 +99,8 @@ function Home() {
                     <div className="card__info mt-2 py-2">
                       <span className="card__category"> สมุนไพรไทย </span>
                       <h3 className="card__title">{item.address}</h3>
+                    </div>
+                    <div className="absolute bottom-2 left-2 flex items-center flex-wrap px-4">
                       <span className="card__by">ชื่อ <Link to={`/farm/${item?._id}`} className="card_name" title="ชื่อแหล่งเพาะปลูก">{item.name}</Link></span>
                     </div>
                   </article>

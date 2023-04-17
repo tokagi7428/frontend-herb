@@ -263,7 +263,7 @@ function Herbs() {
                     <div className="card__info mt-2 py-2">
                       <span className="card__category"> {item.name} </span>
                       <h3 className="card__title">{item.shortProperties}</h3>
-                      <div className="flex align-items justify-between">
+                      <div className="absolute bottom-2 flex items-center w-5/6 justify-between">
                         <span className="card__by">ชื่อ <Link to={`/herb/${item?._id}`} className="card_name" title={item.name}>{item.name}</Link></span>
                         <span className="card__time hover:text-black">ราคา {item.price} บาท</span>
                       </div>
