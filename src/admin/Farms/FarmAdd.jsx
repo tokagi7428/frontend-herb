@@ -48,9 +48,9 @@ function FarmAdd() {
 
   return (
     <div className='relative w-full'>
-      <Helmet><title>แหล่งเพาะปลูกเกษตรกร</title></Helmet>
+      <Helmet><title>แหล่งเพาะปลูกแหล่งเพาะปลูก</title></Helmet>
       <div className="lg:max-w-5xl md:max-w-3xl max-w-xl p-10 w-full mx-auto my-4 w-md shadow-xl rounded-xl border-2">
-        <h1 className='text-center text-xl'>แหล่งเพาะปลูกเกษตรกร</h1>
+        <h1 className='text-center text-xl'>แหล่งเพาะปลูกแหล่งเพาะปลูก</h1>
         <div className="flex flex-col my-3">
           <p className='mb-2'>ชื่อแหล่งเพาะปลูก</p>
           <input type="text" value={name} onChange={(e) => setName(e.target.value)} name="name" className='border p-2 outline-none focus:border-2 focus:border-green-400 placeholder:font-semibold' required />
