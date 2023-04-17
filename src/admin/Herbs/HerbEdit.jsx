@@ -45,8 +45,8 @@ function HerbEdit({ herb, error, loading, test }) {
         const fetchData = async () => {
             try {
                 dispatch(FETCH_REQUEST);
-                const { data } = await axios.get(`https://mushy-colt-hosiery.cyclic.app//api/herb/${id}`);
-                console.log({ data })
+                const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/herb/${id}`);
+                // console.log({ data })
                 dispatch(FETCH_SUCCESS(data.data));
                 setName(data.data?.name)
                 setNameScience(data.data?.nameScience)
