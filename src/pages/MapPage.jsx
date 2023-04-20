@@ -44,10 +44,7 @@ function MapPage() {
   const handleAddClick = (e) => {
     // console.log(e);
     const { lng, lat } = e.lngLat;
-    setNewPlace({
-      long: lng,
-      lat: lat,
-    });
+    alert(`${lng} and ${lat}`)
   };
 
   // useEffect(() => {
@@ -85,6 +82,7 @@ function MapPage() {
         <GeolocateControl
           positionOptions={{ enableHighAccuracy: true }}
           trackUserLocation={true}
+          onGeolocate={(e) => alert(`lat : ${e.coords.latitude} and long : ${e.coords.longitude}`)}
         />
         <NavigationControl position="top-right" />
         <div className="map-link-back">
