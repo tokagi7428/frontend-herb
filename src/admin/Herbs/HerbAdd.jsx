@@ -36,7 +36,7 @@ function HerbAdd() {
       alert("กรุณากรอกข้อมูลให้ครบถ้วน")
       return
     }
-    console.log({ name, nameScience, otherName, image, imageBlade, imageBloom, imageFruit, desc, descBlade, descBloom, descFruit, properties, propertiesBlade, propertiesBloom, propertiesFruit, price, howToUse, reference })
+    // console.log({ name, nameScience, otherName, image, imageBlade, imageBloom, imageFruit, desc, descBlade, descBloom, descFruit, properties, propertiesBlade, propertiesBloom, propertiesFruit, price, howToUse, reference })
     e.preventDefault();
     createherb({ name, nameScience, otherName, image, imageBlade, imageBloom, imageFruit, imageRoot, desc, descBlade, descBloom, descFruit, descRoot, properties, propertiesBlade, propertiesBloom, propertiesFruit, propertiesRoot, price, howToUse, reference, shortProperties })
     navigate("/admin")

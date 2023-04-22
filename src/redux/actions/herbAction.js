@@ -40,7 +40,7 @@ export const getherb = async (id) => {
 // add
 export const createherb = async (datas) => {
     try {
-        console.log({ datas })
+        // console.log({ datas })
         const res = await axios.post(`https://mushy-colt-hosiery.cyclic.app//api/herb/`, datas)
         const { message } = res.data
         toast.success(message)
@@ -54,7 +54,7 @@ export const createherb = async (datas) => {
 export const editherb = async (id, datas) => {
     try {
         const res = await axios.put(`https://mushy-colt-hosiery.cyclic.app//api/herb/${id}`, datas)
-        console.log("updated : ", res)
+        // console.log("updated : ", res)
         const { message } = res.data
         toast.success(message)
     } catch (e) {
@@ -66,7 +66,7 @@ export const editherb = async (id, datas) => {
 export const deleteherb = async (id) => {
     try {
         const res = await axios.delete(`https://mushy-colt-hosiery.cyclic.app//api/herb/${id}`)
-        console.log("deleted : ", res)
+        // console.log("deleted : ", res)
         const { message } = res
         toast.success(message)
     } catch (e) {

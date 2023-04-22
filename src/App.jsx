@@ -20,6 +20,7 @@ import HerbId from './pages/Herbs/HerbId';
 import Footer from './components/footer/Footer';
 import Preloader from './components/preloader/Preloader';
 import SendImage from './pages/SendImage';
+import ProtectedRoute from './utils/ProtectedRoute';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
@@ -43,7 +44,11 @@ function App() {
             <Route path='/chatbot' element={<Chatbot />} />
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Register />} />
-            <Route path='/admin' element={<Admin />} />
+            <Route path='/admin' element={
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
+            } />
             <Route path='/admin/farm/add' element={<FarmAdd />} />
             <Route path='/admin/farm/edit/:id' element={<FarmEdit />} />
             <Route path='/admin/farmAdmin/:id' element={<FarmAdmin />} />

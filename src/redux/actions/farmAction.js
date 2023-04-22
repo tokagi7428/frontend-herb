@@ -43,9 +43,9 @@ export const getFarm = async (id) => {
 // add
 export const createFarm = async (datas) => {
     try {
-        console.log({ datas })
+        // console.log({ datas })
         const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/farm`, datas)
-        console.log({ res })
+        // console.log({ res })
         const { message } = res.data
         toast.success(message)
         return res.data
@@ -58,7 +58,7 @@ export const createFarm = async (datas) => {
 export const editFarm = async (id, datas) => {
     try {
         const res = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/farm/edit/${id}`, datas)
-        console.log("updated : ", res)
+        // console.log("updated : ", res)
         const { message } = res.data
         toast.success(message)
         return res.data
@@ -71,7 +71,7 @@ export const editFarm = async (id, datas) => {
 export const deleteFarm = async (id) => {
     try {
         const res = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/farm/${id}`)
-        console.log("deleted : ", res)
+        // console.log("deleted : ", res)
         const { message } = res.data
         toast.success(message)
     } catch (e) {

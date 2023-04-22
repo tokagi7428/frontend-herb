@@ -201,3 +201,20 @@ body {
 .card:hover .card__info-hover {
   opacity: 1;
 }
+#cm-ov, #cs-ov {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  visibility: hidden;
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.54);
+  display: none;
+  transition: none;
+}
+
+#cm{
+  background: linear-gradient(to right,#024959,#026773);
+  color:#fff;
+}

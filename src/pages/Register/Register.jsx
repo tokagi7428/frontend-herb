@@ -35,7 +35,7 @@ function Register({ registerUser, props: { setLoginActive, loginActive, toggleFo
             })
           }
           onSubmit={(values, { setSubmitting, setFieldError }) => {
-            console.log({ values })
+            // console.log({ values })
             registerUser(values, navigate, redirect, setSubmitting, setFieldError)
           }}
         >

@@ -18,7 +18,7 @@ function FarmHerbs() {
     }, [dispatch])
 
     const handleDelete = (id, name) => {
-        console.log("id : ", id)
+        // console.log("id : ", id)
         if (confirm(`คุณจะลบ ${name} นี้ใช่หรือไม่`)) {
             window.location.reload(false);
             deleteFarm(id)

@@ -3,7 +3,7 @@ import { useState, useRef } from "react";
 const SendImage = ({ imageRef }) => {
     const [streaming, setStreaming] = useState(null); // streaming state
     const inputImageRef = useRef(null); // video input reference
-    console.log({ imageRef })
+    // console.log({ imageRef })
     // closing image
 
 

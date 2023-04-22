@@ -6,7 +6,7 @@ import { useLocation } from 'react-router-dom'
 import { getherb } from '../../redux/actions/herbAction'
 import { useDispatch } from 'react-redux'
 import { FETCH_ERROR, FETCH_REQUEST, FETCH_SUCCESS } from '../../redux/actions/fetchAction'
-import { FacebookIcon, FacebookShareButton, FacebookShareCount } from 'react-share'
+// import { FacebookIcon, FacebookShareButton, FacebookShareCount } from 'react-share'
 import { toast } from 'react-toastify'
 function HerbId() {
     const [herb, setHerb] = useState(null)
@@ -30,6 +30,23 @@ function HerbId() {
         };
         fetchData();
     }, [dispatch])
+
+    useEffect(() => {
+
+        createCountView()
+    }, [])
+
+    const createCountView = async () => {
+        try {
+            let ipAddress = await axios.get('https://api.ipify.org/?format=json')
+            ipAddress = ipAddress.data.ip
+            let type = "herb"
+            return data = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/statistics/countApi`, { did: id, ip: ipAddress, type });
+        } catch (err) {
+            toast.error(err)
+        }
+    }
+
     return (
         <div className='bg-amber-200 py-10 -mb-20'>
             <Helmet><title>{herb?.name}</title></Helmet>

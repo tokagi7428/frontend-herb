@@ -1,0 +1,4 @@
+REACT_APP_MAPBOX = pk.eyJ1IjoidG9rYWdpNzQyOCIsImEiOiJjbDVuaHN0aTUxM3FtM2RsdmNnZ3RzbmppIn0.8j30FRZvMi9xXyMquHVBOA
+VITE_BACKEND_URL = 'https://zany-blue-angler-kilt.cyclic.app'
+VITE_YOLO_URL = 'http://127.0.0.1:5000/api/imageHerb'
+# VITE_BACKEND_URL = 'http://localhost:5000'

@@ -24,9 +24,12 @@ export const loginUser = (
         setFieldError("password", message)
       } else if (data.status === "SUCCESS") {
         toast.success("เข้าสู่ระบบสำเร็จ")
-        console.log("data : ", data.data);
+        // console.log("data : ", data.data);
         const userData = data.data;
         const token = userData.token;
+        const userToken = localStorage.setItem("user-token", token)
+        const keep_data = { ROLE: userData.role, TOKEN: token }
+        const user = localStorage.setItem("user", JSON.stringify(keep_data))
         sessionService
           .saveSession(token)
           .then(() => {
@@ -63,11 +66,11 @@ export const registerUser = (
         }
       }).then((res) => {
         const { data } = res
-        console.log({ res })
-        console.log("status", data)
+        // console.log({ res })
+        // console.log("status", data)
         if (data.status === "FAILED") {
           const { message } = data;
-          console.log("message : ", message)
+          // console.log("message : ", message)
 
           // check error from backend
           if (message.includes("username")) {
@@ -100,5 +103,7 @@ export const logoutUser = () => {
   return () => {
     sessionService.deleteSession()
     sessionService.deleteUser()
+    localStorage.removeItem("user")
+    localStorage.removeItem("user-token")
   }
 }

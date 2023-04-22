@@ -45,7 +45,7 @@ function Login({ loginUser, loginActive, setLoginActive, user }) {
             })
           }
           onSubmit={(values, { setSubmitting, setFieldError }) => {
-            console.log({ values })
+            // console.log({ values })
             loginUser(values, navigate, setSubmitting, setFieldError)
           }}
         >
